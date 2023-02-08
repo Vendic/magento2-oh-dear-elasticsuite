@@ -1,0 +1,21 @@
+{
+    "name": "vendic/magento2-oh-dear-elasticsuite",
+    "description": "Oh Dear checks for Magento 2 ElasticSuite",
+    "require": {
+        "php": "~8.1.0",
+        "vendic/magento2-oh-dear-checks": "dev-master",
+        "smile/elasticsuite": "^2.0"
+    },
+    "type": "magento2-module",
+    "license": [
+        "MIT"
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Vendic\\OhDearElasticSuite\\": ""
+        }
+    }
+}

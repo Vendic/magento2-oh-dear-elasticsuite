@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Check collection -->
+    <type name="Vendic\OhDear\Api\CheckListInterface">
+        <arguments>
+            <argument name="checks" xsi:type="array">
+                <item name="elasticsuite_elasticsearch" xsi:type="object">Vendic\OhDearElasticSuite\Checks\ElasticSuite</item>
+                <item name="elasticsuite_elasticsearch_shards" xsi:type="object">Vendic\OhDearElasticSuite\Checks\ElasticSuiteShards</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Check inputs -->
+    <type name="Vendic\OhDearElasticSuite\Checks\ElasticSuiteShards">
+        <arguments>
+            <argument name="maximumShards" xsi:type="number">1000</argument>
+        </arguments>
+    </type>
+</config>
