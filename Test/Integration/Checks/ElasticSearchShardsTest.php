@@ -5,7 +5,9 @@
 
 namespace Vendic\OhDear\Test\Integration\Checks;
 
+use Elasticsearch\Namespaces\CatNamespace as ElasticsearchCatNamespace;
 use Magento\TestFramework\Helper\Bootstrap;
+use OpenSearch\Namespaces\CatNamespace as OpenSearchCatnamespace;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Smile\ElasticsuiteCore\Client\ClientBuilder;
@@ -33,15 +35,17 @@ class ElasticSearchShardsTest extends TestCase
             $shards[] = [];
         }
 
-        /** @var MockObject & \Elasticsearch\Namespaces\CatNamespace $catMock */
-        $catMock = $this->getMockBuilder(\Elasticsearch\Namespaces\CatNamespace::class)
+        /** @var MockObject & ElasticsearchCatNamespace|OpenSearchCatnamespace $catMock */
+        $catMock = $this->getMockBuilder($this->getCatNamespaceClassName())
             ->disableOriginalConstructor()
             ->onlyMethods(['shards'])
             ->getMock();
         $catMock->method('shards')->willReturn($shards);
 
         /** @var MockObject & \Elasticsearch\Client $mockClient */
-        $mockClient = $this->getMockBuilder(\Elasticsearch\Client::class)
+        $mockClient = $this->getMockBuilder(
+            $this->getClientClassName()
+        )
             ->disableOriginalConstructor()
             ->onlyMethods(['cat'])
             ->getMock();
@@ -71,15 +75,17 @@ class ElasticSearchShardsTest extends TestCase
 
     public function testCannotGetShardsFromEs(): void
     {
-        /** @var MockObject & \Elasticsearch\Namespaces\CatNamespace $catMock */
-        $catMock = $this->getMockBuilder(\Elasticsearch\Namespaces\CatNamespace::class)
+        /** @var MockObject & ElasticsearchCatNamespace $catMock */
+        $catMock = $this->getMockBuilder(
+            $this->getCatNamespaceClassName()
+        )
             ->disableOriginalConstructor()
             ->onlyMethods(['shards'])
             ->getMock();
         $catMock->method('shards')->willThrowException(new \Exception('Cannot get shards'));
 
         /** @var MockObject & \Elasticsearch\Client $mockClient */
-        $mockClient = $this->getMockBuilder(\Elasticsearch\Client::class)
+        $mockClient = $this->getMockBuilder($this->getClientClassName())
             ->disableOriginalConstructor()
             ->onlyMethods(['cat'])
             ->getMock();
@@ -99,5 +105,20 @@ class ElasticSearchShardsTest extends TestCase
         $this->assertEquals(CheckStatus::STATUS_CRASHED, $checkRun->getStatus());
         $this->assertEquals('Elasticsearch shards check crashed', $checkRun->getShortSummary());
         $this->assertEquals('Elasticsearch shards check crashed', $checkRun->getNotificationMessage());
+    }
+
+    private function isOpenSearchInstalled(): bool
+    {
+        return class_exists(\OpenSearch\Client::class);
+    }
+
+    private function getCatNamespaceClassName(): string
+    {
+        return $this->isOpenSearchInstalled() ? OpenSearchCatnamespace::class : ElasticsearchCatNamespace::class;
+    }
+
+    private function getClientClassName(): string
+    {
+        return $this->isOpenSearchInstalled() ? \OpenSearch\Client::class : \Elasticsearch\Client::class;
     }
 }
