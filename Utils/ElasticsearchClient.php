@@ -18,7 +18,10 @@ class ElasticsearchClient
     {
     }
 
-    public function get(): \Elasticsearch\Client
+    /**
+     * @return \Elasticsearch\Client|\OpenSearch\Client
+     */
+    public function get()
     {
         /** @var ClientBuilder $clientBuilder */
         $clientBuilder = $this->objectManager->get(ClientBuilder::class);
