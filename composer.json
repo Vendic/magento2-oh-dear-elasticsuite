@@ -2,7 +2,7 @@
     "name": "vendic/magento2-oh-dear-elasticsuite",
     "description": "Oh Dear checks for Magento 2 ElasticSuite",
     "require": {
-        "php": "~8.1.0|~8.2.0",
+        "php": "~8.1.0|~8.2.0|~8.3.0|~8.4.0",
         "vendic/magento2-oh-dear-checks": "^1.0",
         "smile/elasticsuite": "^2.0"
     },
