@@ -5,8 +5,10 @@
 
 namespace Vendic\OhDear\Test\Integration\Checks;
 
+use Elasticsearch\Client;
 use Elasticsearch\Namespaces\CatNamespace as ElasticsearchCatNamespace;
 use Magento\TestFramework\Helper\Bootstrap;
+use Magento\TestFramework\ObjectManager;
 use OpenSearch\Namespaces\CatNamespace as OpenSearchCatnamespace;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -18,8 +20,36 @@ class ElasticSearchShardsTest extends TestCase
 {
     public function testShardsOk(): void
     {
+        // The client is mocked (like in the other tests) so the result does not depend on how many
+        // shards the host cluster happens to have - on shared dev machines this exceeded the limit.
+        $shards = [];
+        for ($i = 0; $i < 100; $i++) {
+            $shards[] = [];
+        }
+
+        /** @var MockObject & ElasticsearchCatNamespace|OpenSearchCatnamespace $catMock */
+        $catMock = $this->getMockBuilder($this->getCatNamespaceClassName())
+            ->disableOriginalConstructor()
+            ->onlyMethods(['shards'])
+            ->getMock();
+        $catMock->method('shards')->willReturn($shards);
+
+        /** @var MockObject & Client $mockClient */
+        $mockClient = $this->getMockBuilder($this->getClientClassName())
+            ->disableOriginalConstructor()
+            ->onlyMethods(['cat'])
+            ->getMock();
+        $mockClient->method('cat')->willReturn($catMock);
+
+        /** @var ObjectManager $objectManager */
+        $objectManager = Bootstrap::getObjectManager();
+
+        $mockClientBuilder = $this->createMock(ClientBuilder::class);
+        $mockClientBuilder->method('build')->willReturn($mockClient);
+        $objectManager->addSharedInstance($mockClientBuilder, ClientBuilder::class);
+
         /** @var ElasticSuiteShards $shardsCheck */
-        $shardsCheck = Bootstrap::getObjectManager()->get(ElasticSuiteShards::class);
+        $shardsCheck = $objectManager->get(ElasticSuiteShards::class);
         $checkRun = $shardsCheck->run();
 
         // Assert that check staus is OK
@@ -42,7 +72,7 @@ class ElasticSearchShardsTest extends TestCase
             ->getMock();
         $catMock->method('shards')->willReturn($shards);
 
-        /** @var MockObject & \Elasticsearch\Client $mockClient */
+        /** @var MockObject & Client $mockClient */
         $mockClient = $this->getMockBuilder(
             $this->getClientClassName()
         )
@@ -51,7 +81,7 @@ class ElasticSearchShardsTest extends TestCase
             ->getMock();
         $mockClient->method('cat')->willReturn($catMock);
 
-        /** @var \Magento\TestFramework\ObjectManager $objectManager */
+        /** @var ObjectManager $objectManager */
         $objectManager = Bootstrap::getObjectManager();
 
         $mockClientBuilder = $this->createMock(ClientBuilder::class);
@@ -84,14 +114,14 @@ class ElasticSearchShardsTest extends TestCase
             ->getMock();
         $catMock->method('shards')->willThrowException(new \Exception('Cannot get shards'));
 
-        /** @var MockObject & \Elasticsearch\Client $mockClient */
+        /** @var MockObject & Client $mockClient */
         $mockClient = $this->getMockBuilder($this->getClientClassName())
             ->disableOriginalConstructor()
             ->onlyMethods(['cat'])
             ->getMock();
         $mockClient->method('cat')->willReturn($catMock);
 
-        /** @var \Magento\TestFramework\ObjectManager $objectManager */
+        /** @var ObjectManager $objectManager */
         $objectManager = Bootstrap::getObjectManager();
 
         $mockClientBuilder = $this->createMock(ClientBuilder::class);
