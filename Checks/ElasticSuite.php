@@ -33,6 +33,7 @@ class ElasticSuite implements CheckInterface
             $checkResult->setStatus(CheckStatus::STATUS_SKIPPED);
             $checkResult->setShortSummary('ElasticSuite is not enabled');
             $checkResult->setNotificationMessage('ElasticSuite is not enabled');
+            return $checkResult;
         }
 
         // Using the objectmanager here so we don't have to add a dependency on the Elasticsuite module

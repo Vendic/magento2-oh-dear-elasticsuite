@@ -40,7 +40,7 @@ class ElasticSuiteTest extends TestCase
     private function elasticSuiteDisabledAssertions(CheckResultInterface $checkResult): void
     {
         $this->assertEquals(CheckStatus::STATUS_SKIPPED, $checkResult->getStatus());
-        $this->assertEquals('Elasticsearch not responding', $checkResult->getNotificationMessage());
-        $this->assertEquals('Elasticsearch not responding', $checkResult->getShortSummary());
+        $this->assertEquals('ElasticSuite is not enabled', $checkResult->getNotificationMessage());
+        $this->assertEquals('ElasticSuite is not enabled', $checkResult->getShortSummary());
     }
 }
