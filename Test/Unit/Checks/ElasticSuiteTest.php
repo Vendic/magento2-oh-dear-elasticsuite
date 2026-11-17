@@ -21,9 +21,10 @@ class ElasticSuiteTest extends TestCase
         $objectManager->expects($this->never())->method('get');
 
         $moduleManager = $this->createMock(ModuleManager::class);
-        $moduleManager->method('isEnabled')->with('Smile_ElasticsuiteCatalog')->willReturn(false);
+        $moduleManager->expects($this->once())
+            ->method('isEnabled')->with('Smile_ElasticsuiteCatalog')->willReturn(false);
 
-        $checkResultFactory = $this->createMock(CheckResultFactory::class);
+        $checkResultFactory = $this->createStub(CheckResultFactory::class);
         $checkResultFactory->method('create')->willReturn(new CheckResult());
 
         $checkResult = (new ElasticSuite($objectManager, $moduleManager, $checkResultFactory))->run();
