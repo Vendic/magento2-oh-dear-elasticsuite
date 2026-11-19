@@ -144,11 +144,11 @@ class ElasticSearchShardsTest extends TestCase
 
     private function getCatNamespaceClassName(): string
     {
-        return $this->isOpenSearchInstalled() ? OpenSearchCatnamespace::class : ElasticsearchCatNamespace::class;
+        return $this->isOpenSearchInstalled() ? OpenSearchCatnamespace::class : 'Elasticsearch\\Namespaces\\CatNamespace';
     }
 
     private function getClientClassName(): string
     {
-        return $this->isOpenSearchInstalled() ? \OpenSearch\Client::class : \Elasticsearch\Client::class;
+        return $this->isOpenSearchInstalled() ? \OpenSearch\Client::class : 'Elasticsearch\\Client';
     }
 }
